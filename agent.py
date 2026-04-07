@@ -9,41 +9,51 @@ class InvoiceAgent:
         self.threshold = 100000
 
     def extract_fields(self, text: str) -> Dict:
-        """Robust field extraction for real and synthetic invoices"""
-        # Invoice ID
-        invoice_id = re.search(r"Invoice\s*(?:ID|No|Number|#)[:\s]*(\S+)", text, re.I)
-        
-        # Vendor / Seller
-        vendor = re.search(r"(?:Vendor|Seller|Supplier)[:\s]*(.+?)(?:\n|$)", text, re.I)
-        
-        # Amount (improved regex to handle different formats)
-        amount_match = re.search(r"(?:Amount|Total|Grand Total|Payable|Net Amount)[:\s]*[₹$]?\s*([\d,]+\.?\d*)", text, re.I)
-        
-        # Date
-        date = re.search(r"(?:Date|Invoice Date)[:\s]*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})", text, re.I)
+        """Highly robust extraction for messy / OCR output"""
+        text = text.replace("\n", " ").strip()
 
-        # Safe amount extraction
+        # 1. Invoice ID - very flexible
+        invoice_id = re.search(r"Invoice\s*(?:ID|No|Number|#)?[:\s]*(\S+)", text, re.I)
+
+        # 2. Vendor - try multiple patterns
+        vendor = None
+        vendor_match = re.search(r"(?:Vendor|Seller|Supplier|From)[:\s]*(.+?)(?=\s*(?:Amount|Total|Date|Invoice ID|\d{1,2}[/-]))", text, re.I)
+        if vendor_match:
+            vendor = vendor_match.group(1).strip()
+        else:
+            # Fallback: look for known vendors in text
+            for known in self.known_vendors:
+                if known.lower() in text.lower():
+                    vendor = known
+                    break
+
+        # 3. Amount - improved
+        amount_match = re.search(r"(?:Amount|Total|Grand Total|Payable|Net)[:\s]*[₹$]?\s*([\d,]+\.?\d*)", text, re.I)
+        amount = 0.0
         if amount_match:
             amount_str = amount_match.group(1).replace(",", "").strip()
             try:
                 amount = float(amount_str)
             except ValueError:
                 amount = 0.0
-        else:
-            amount = 0.0
+
+        # 4. Date
+        date_match = re.search(r"(?:Date|Invoice Date)[:\s]*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})", text, re.I)
 
         return {
             "invoice_id": invoice_id.group(1) if invoice_id else None,
-            "vendor": vendor.group(1).strip() if vendor else None,
+            "vendor": vendor,
             "amount": amount,
-            "date": date.group(1) if date else None
+            "date": date_match.group(1) if date_match else None
         }
 
     def check_fraud(self, extracted: Dict, is_duplicate: bool = False) -> tuple:
         flags = []
-        confidence = 85
+        confidence = 80
 
         amount = extracted.get("amount", 0)
+        vendor = extracted.get("vendor")
+        invoice_id = extracted.get("invoice_id")
 
         # High Amount
         if amount > self.threshold:
@@ -51,23 +61,25 @@ class InvoiceAgent:
             confidence -= 20
 
         # Unknown Vendor
-        vendor = extracted.get("vendor")
-        if vendor and vendor not in self.known_vendors:
-            flags.append(f"Unknown vendor: {vendor}")
-            confidence -= 25
+        if vendor:
+            vendor_clean = vendor.strip()
+            is_known = any(v.lower() in vendor_clean.lower() for v in self.known_vendors)
+            if not is_known:
+                flags.append(f"Unknown vendor: {vendor_clean}")
+                confidence -= 25
+        else:
+            flags.append("Missing Vendor")
+            confidence -= 15
 
         # Duplicate
         if is_duplicate:
             flags.append("Duplicate Invoice ID")
             confidence -= 30
 
-        # Missing critical fields
-        if not extracted.get("invoice_id"):
+        # Missing Invoice ID
+        if not invoice_id:
             flags.append("Missing Invoice ID")
             confidence -= 20
-        if not vendor:
-            flags.append("Missing Vendor")
-            confidence -= 15
 
         # Suspicious round amount
         if amount > 50000 and amount % 1000 == 0:
@@ -90,7 +102,6 @@ class InvoiceAgent:
         fraud_detected, reasons, confidence = self.check_fraud(extracted, is_duplicate)
         decision = self.decide(fraud_detected)
 
-        # Update memory
         if invoice_id:
             self.seen_invoice_ids.add(invoice_id)
 
