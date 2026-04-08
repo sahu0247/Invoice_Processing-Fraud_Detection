@@ -11,8 +11,8 @@ dependencies = [
     "uvicorn",
     "pydantic",
     "faker",
-    "openenv"
+    "openenv-core>=0.2.0"
 ]
 
 [project.scripts]
-server = "app:app"
+server = "server.app:app"
