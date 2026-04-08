@@ -1,6 +1,8 @@
 fastapi
 uvicorn[standard]
-pydantic
+streamlit
 pandas
-plotly==5.24.0
+plotly
 faker
+python-multipart
+
