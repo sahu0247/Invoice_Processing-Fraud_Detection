@@ -1,0 +1,20 @@
+name: invoiceguard-openenv
+version: "1.0.0"
+description: Invoice Fraud Detection Environment for OpenEnv Hackathon
+
+# Environment metadata
+type: custom
+framework: fastapi
+
+# Main entry points
+app: app:app
+port: 7860
+
+# Required for validator
+inference_script: inference.py
+dockerfile: Dockerfile
+
+# Optional but recommended
+health_endpoint: /health
+reset_endpoint: /reset
+step_endpoint: /step
