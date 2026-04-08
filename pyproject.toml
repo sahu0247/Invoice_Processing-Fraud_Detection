@@ -3,7 +3,7 @@ name = "invoice-fraud-detection"
 version = "0.1.0"
 description = "AI Invoice Fraud Detection Agent"
 authors = [
-    { name = "Sunayana Padhy" }
+    { name = "subhamsahu06" }
 ]
 
 dependencies = [
