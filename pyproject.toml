@@ -1,0 +1,16 @@
+[project]
+name = "invoice-fraud-detection"
+version = "0.1.0"
+description = "AI Invoice Fraud Detection Agent"
+authors = [
+    { name = "Your Name" }
+]
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "faker"
+]
+
+[tool.setuptools]
+py-modules = ["app", "inference", "agent", "env", "tasks"]
