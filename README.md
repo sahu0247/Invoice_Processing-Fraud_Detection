@@ -1,118 +1,112 @@
-# 🧠 AI Invoice Fraud Detection Agent
+# 🛡️ InvoiceGuard AI: Fraud Detection Agent
 
-**OpenEnv-style AI Agent** for automated invoice processing and fraud detection in finance workflows.
-
-This project simulates a real-world intelligent agent that reads **unstructured/raw invoice text**, extracts key fields, applies fraud detection rules, and makes autonomous decisions to **Approve** or **Flag** invoices.
-
-It demonstrates modern **agentic AI** concepts: step-by-step reasoning, modular actions, reward-based evaluation, and synthetic data generation — all without needing external APIs.
-
-Perfect for learning AI agents, reinforcement learning-style environments, or building finance automation tools.
+> **An OpenEnv-compatible intelligent agent system designed for automated accounts payable processing and invoice fraud detection.**
 
 ---
 
-## 🌟 Highlights
+<div align="center">
 
-- Fully synthetic dataset generation (no manual data required)
-- Clear **OpenEnv-style** environment with observation-action-reward loop
-- Modular agent with transparent step-by-step reasoning
-- Reward system (max **1.0** per task) for proper extraction, fraud detection & decision
-- Beautiful interactive **Streamlit web demo**
-- Handles noisy and unstructured invoice text
-- Lightweight, fully offline, and easy to extend
-- Great baseline for real-world Accounts Payable (AP) automation
+[![Status](https://img.shields.io/badge/Status-Prototype-00C2FF?style=for-the-badge)](https://github.com/)
+[![Platform](https://img.shields.io/badge/Platform-Python_3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org/)
+[![UI](https://img.shields.io/badge/UI-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![License](https://img.shields.io/badge/License-MIT-FFC107?style=for-the-badge)](LICENSE)
+
+</div>
 
 ---
 
-## 📁 Project Structure & File Explanation
+## 🌌 Overview
 
-| File                  | Purpose |
-|-----------------------|--------|
-| **`baseline.py`**         | Runs the complete experiment: generates 100 synthetic tasks, creates the environment, lets the agent process every invoice, and prints the final evaluation score (total reward and success rate). Best for benchmarking. |
-| **`tasks.py`**            | Generates synthetic invoices using Faker. Creates realistic invoice text with random vendors, amounts, and dates. Also injects controlled fraud cases (high amount, unknown vendors) along with ground truth labels. Shows how to create scalable training/evaluation data. |
-| **`env.py`**              | Implements an **OpenEnv-style simulator** (inspired by Gym/OpenAI environments). Manages task progression, provides observations to the agent, receives actions, calculates per-step rewards, and tracks overall performance. |
-| **`agent.py`**            | Core intelligence — the `InvoiceAgent` class. Performs three key actions: field extraction (using regex), fraud checking (rule-based), and final decision making. Easy to upgrade (e.g., replace regex with LLM). |
-| **`predict.py`**          | Quick testing script. Allows you to run the agent on single or custom invoices and see detailed output in the terminal. Useful for development and debugging. |
-| **`app.py`**              | Streamlit-based web interface. Users can paste any invoice text and instantly see extracted fields, fraud analysis, reasoning, and the final decision in a clean UI. |
-| **`requirements.txt`**    | Lists all Python dependencies (`faker` for data generation and `streamlit` for the web app). |
-| **`README.md`**           | This documentation file. |
+**InvoiceGuard AI** is a lightweight, fully offline intelligent agent system built to parse raw/OCR-scanned invoice text, extract critical fields, perform multi-criteria fraud analysis, and make decisions to either **Approve** or **Flag** invoices.
+
+Using an **OpenEnv-style** simulator interface (inspired by OpenAI Gym), this project demonstrates core Agentic AI patterns:
+1. **Observation-Action-Reward Loop**: A formal environment evaluates agent actions and issues granular rewards.
+2. **Deterministic & Rule-Based Heuristics**: Highly testable parsing and detection baselines.
+3. **Synthetic Dataset Generation**: Integrated Faker generators simulating hundreds of diverse invoice layouts (normal vs. fraudulent).
 
 ---
 
-## 🎯 How It Works (Workflow)
+## 🛠️ Technology Stack
 
-The agent follows a clear **multi-step reasoning process**:
-
-1. **Observation** — Receives raw invoice text from the environment.
-2. **Extraction** — Parses Invoice ID, Vendor, and Amount using regex.
-3. **Fraud Check** — Applies intelligent rules:
-   - Amount > ₹1,00,000 → High-risk
-   - Vendor is unknown/suspicious (e.g., `UnknownCorp`, `ShadySupplies`)
-4. **Decision** — Outputs `approve` or `flag`.
-5. **Reward** — Environment evaluates the action:
-   - Correct extraction: **+0.2**
-   - Correct fraud detection: **+0.3**
-   - Correct final decision: **+0.5**
-   - Wrong decision: **-0.5**
-   - **Maximum score per invoice = 1.0**
-
-This structure makes the agent transparent, debuggable, and extensible.
+* **Language**: Python 3.8+
+* **Interface**: Streamlit (with Plotly Express charts & Pandas tables)
+* **Data Processing**: SQLite3 (local historical database log), Regex Engine
+* **Mocking Utility**: Faker library (generates custom names, dates, companies)
+* **Design/CSS**: Dark Theme Web UI with status cards and download utilities
 
 ---
 
-## 🚀 Quick Start
+## 📂 Project Directory Structure
 
-### Prerequisites
-- Python 3.8 or higher
+| File | Purpose |
+| :--- | :--- |
+| **[`agent.py`](file:///c:/Users/agfdg/OneDrive/Desktop/git%20repo/Invoice_Processing-Fraud_Detection/agent.py)** | Contains the `InvoiceAgent` class: parses values (regex), analyzes fraud indicators, and returns actions. |
+| **[`env.py`](file:///c:/Users/agfdg/OneDrive/Desktop/git%20repo/Invoice_Processing-Fraud_Detection/env.py)** | Implements `InvoiceEnv`, an OpenEnv environment that tracks step state and assigns rewards. |
+| **[`tasks.py`](file:///c:/Users/agfdg/OneDrive/Desktop/git%20repo/Invoice_Processing-Fraud_Detection/tasks.py)** | Utility to generate clean & fraudulent synthetic invoice tasks. |
+| **[`streamlit_app .py`](file:///c:/Users/agfdg/OneDrive/Desktop/git%20repo/Invoice_Processing-Fraud_Detection/streamlit_app%20.py)** | Fully featured interactive dashboard with charts, evaluation loops, and custom inputs. |
+| **[`baseline.py`](file:///c:/Users/agfdg/OneDrive/Desktop/git%20repo/Invoice_Processing-Fraud_Detection/baseline.py)** | Command line script executing evaluation across 100 sample tasks. |
+| **[`predict.py`](file:///c:/Users/agfdg/OneDrive/Desktop/git%20repo/Invoice_Processing-Fraud_Detection/predict.py)** | Command line prediction script running the agent on individual test inputs. |
+| **[`data_generator.py`](file:///c:/Users/agfdg/OneDrive/Desktop/git%20repo/Invoice_Processing-Fraud_Detection/data_generator.py)** | Supporting dataset utility. |
+| **[`grader.py`](file:///c:/Users/agfdg/OneDrive/Desktop/git%20repo/Invoice_Processing-Fraud_Detection/grader.py)** | Automated grader checking task execution metrics. |
+| **`invoices.db`** | Local SQLite database recording system histories. |
 
-### 1. Clone the repository (or download the files)
+---
 
-### 2. Install dependencies
+## 🎯 Agentic Workflow & Reward Matrix
 
+The agent processes incoming data through a formal execution pipeline:
 
+```mermaid
+graph TD
+    A[Raw Invoice Observation] --> B[Field Extraction Engine]
+    B -->|Extracts ID, Vendor, Amount, Date| C[Fraud Scanner Rules]
+    C -->|Calculates Risk Flags & Confidence| D[Decider Action]
+    D -->|Decision: approve / flag| E[OpenEnv Grader]
+    E -->|Calculates Reward Score| F[Cumulative Metrics Dashboard]
+```
+
+### Reward Criteria (Max 1.0 Point per Invoice)
+* **Field Extraction Accuracy**: `+0.2` if extracted IDs, vendors, and amounts match ground truth.
+* **Fraud Detection Match**: `+0.3` if fraud labels are correctly flagged.
+* **Decision Match**: `+0.5` if the final action matches the target decision; `-0.5` penalty if it differs.
+
+---
+
+## ⚡ Quick Start
+
+### ⚙️ Installation
+Ensure you have Python 3.8+ installed, then install dependencies:
+```bash
 pip install -r requirements.txt
+```
 
-### 3. Run the project in different ways 
+### 🏃 Running the Application
 
-**A. Full Evaluation & Scoring**
+#### A. Interactive Streamlit Web Interface (Recommended)
+Launch the comprehensive analytics portal:
+```bash
+streamlit run "streamlit_app .py"
+```
+The interface allows you to:
+- Test the agent dynamically on raw text inputs or file uploads.
+- Trigger 100-sample synthetic batch generation.
+- Execute full training evaluations and review accuracy/F1 performance plots.
+- View history logs and download data as CSV.
 
-Bashpython baseline.py
+#### B. Command Line Benchmark Evaluation
+Evaluate the agent's baseline accuracy over 100 tasks:
+```bash
+python baseline.py
+```
 
-**B. Quick Prediction on Custom Invoices**
-
-Bashpython predict.py
-
-**C. Interactive Web Demo (Recommended)**
-
-Bashstreamlit run app.py
-
----
-
-### 🧪 Example Outputs
-
-**Normal Invoice**
-
-textInvoice ID: INV8923 | Vendor: Amazon | Amount: 12500 → ✅ APPROVED
-
-**Fraud Cases**
-
-High amount (₹245,000) → 🚩 FLAGGED (High amount)
-
-Suspicious vendor (ShadySupplies) → 🚩 FLAGGED (Unknown vendor)
+#### C. Command Line Single Prediction
+Test local prediction metrics:
+```bash
+python predict.py
+```
 
 ---
 
-### 🛠️ Technologies Used
+## 📄 License
 
-Python 3
-
-Faker — Synthetic realistic data generation
-
-Streamlit — Fast and beautiful web UI
-
-Regex-based parsing (easily replaceable with LLMs)
-
-Rule-based reasoning (hybrid agent design)
-
-OpenEnv-style architecture for agent-environment interaction
-
----
+Distributed under the MIT License. See [LICENSE](LICENSE) for more details.
